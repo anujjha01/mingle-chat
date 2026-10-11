@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { LogOut, MessageSquare, Moon, Settings, Sun, User } from "lucide-react";
+import { useThemeStore } from "../store/useThemeStore";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+  const { theme, setTheme } = useThemeStore();
 
   return (
     <header
-      className="fixed top-0 z-40 w-full border-b border-[#e5ebe6] bg-white/85 backdrop-blur-xl"
+      className="fixed top-0 z-40 w-full border-b border-base-300 bg-base-100/85 text-base-content backdrop-blur-xl"
     >
       <div className="container mx-auto px-4 h-16">
         <div className="flex items-center justify-between h-full">
@@ -21,9 +23,18 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded-xl p-2 text-base-content/70 transition hover:bg-base-200 hover:text-primary"
+              onClick={() => setTheme(theme === "dark" ? "mingle" : "dark")}
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            >
+              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
             <Link
               to={"/settings"}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#60746b] transition hover:bg-[#f0f5f1] hover:text-[#246b55]"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-base-content/70 transition hover:bg-base-200 hover:text-primary"
             >
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>

@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 :root { font-family: 'DM Sans', sans-serif; font-synthesis: none; text-rendering: optimizeLegibility; }
-body { min-width: 320px; min-height: 100vh; margin: 0; background: #f5f7f4; color: #1d2b28; }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: transparent; color: inherit; }
 h1,h2,h3 { font-family: 'Manrope', sans-serif; }
 button, input { font: inherit; }
 .app-shell { background: radial-gradient(ellipse at top left, #e8f1eb 0, transparent 48%), #f5f7f4; }
@@ -16,3 +16,18 @@ button, input { font: inherit; }
 .message-bubble.mine { background: #246b55; color: #fff; border-bottom-right-radius: 5px; }
 .message-bubble.theirs { background: #edf2ee; color: #24332d; border-bottom-left-radius: 5px; }
 .brand-mark { background: linear-gradient(145deg,#2f8066,#205844); box-shadow: 0 7px 18px #276b5530; }
+
+.app-theme { background-color: oklch(var(--b1)); color: oklch(var(--bc)); }
+[data-theme="dark"] .app-shell { background: radial-gradient(ellipse at top left, #293b38 0, transparent 48%), #1d232a; }
+[data-theme="dark"] .chat-panel { border-color: #39434b; background: rgba(29,35,42,.94); box-shadow: 0 24px 80px rgba(0,0,0,.24); }
+[data-theme="dark"] [class*="bg-white"] { background-color: #242b33 !important; }
+[data-theme="dark"] [class*="bg-[#e"],
+[data-theme="dark"] [class*="bg-[#f"],
+[data-theme="dark"] [class*="bg-[#d"],
+[data-theme="dark"] [class*="bg-[#c"] { background-color: #29323a !important; }
+[data-theme="dark"] [class*="text-[#"] { color: #d5dde4 !important; }
+[data-theme="dark"] [class*="border-[#"] { border-color: #39434b !important; }
+[data-theme="dark"] .soft-scrollbar { scrollbar-color: #58646e transparent; }
+[data-theme="dark"] .soft-scrollbar::-webkit-scrollbar-thumb { background: #58646e; }
+[data-theme="dark"] .message-bubble.mine { background: #246b55; color: #fff; }
+[data-theme="dark"] .message-bubble.theirs { background: #29343b; color: #e3ebe8; }

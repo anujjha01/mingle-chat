@@ -32,7 +32,7 @@ const App = () => {
     );
 
   return (
-    <div data-theme={theme}>
+    <div className="app-theme min-h-screen transition-colors" data-theme={theme}>
       <Navbar />
 
       <Routes>
