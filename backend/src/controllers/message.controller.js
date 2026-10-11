@@ -4,7 +4,12 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT id, full_name, email, profile_pic, created_at FROM users WHERE id <> $1 ORDER BY full_name", [req.user._id]);
+    const { rows } = await pool.query(
+      `SELECT id, full_name, email, profile_pic, created_at,
+              COALESCE(last_seen_at > NOW() - INTERVAL '90 seconds', FALSE) AS is_online
+       FROM users WHERE id <> $1 ORDER BY full_name`,
+      [req.user._id]
+    );
     res.status(200).json(rows.map(toUser));
   } catch (error) {
     console.error("Error in getUsersForSidebar", error.message);

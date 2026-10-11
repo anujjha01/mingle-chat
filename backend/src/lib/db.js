@@ -16,9 +16,11 @@ export const connectDB = async () => {
       email TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
       profile_pic TEXT NOT NULL DEFAULT '',
+      last_seen_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ;
     CREATE TABLE IF NOT EXISTS messages (
       id BIGSERIAL PRIMARY KEY,
       sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -38,6 +40,7 @@ export const toUser = (row) => row && ({
   fullName: row.full_name,
   email: row.email,
   profilePic: row.profile_pic,
+  isOnline: row.is_online ?? false,
   createdAt: row.created_at,
 });
 

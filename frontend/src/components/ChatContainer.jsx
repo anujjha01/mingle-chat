@@ -14,7 +14,11 @@ const ChatContainer = () => {
   useEffect(() => {
     getMessages(selectedUser._id);
     subscribeToMessages();
-    return () => unsubscribeFromMessages();
+    const refreshMessages = setInterval(() => getMessages(selectedUser._id, { silent: true }), 2500);
+    return () => {
+      clearInterval(refreshMessages);
+      unsubscribeFromMessages();
+    };
   }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {

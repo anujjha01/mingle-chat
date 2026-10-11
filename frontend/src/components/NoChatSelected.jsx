@@ -18,7 +18,7 @@ const NoChatSelected = () => {
         {/* Welcome Text */}
         <h2 className="text-2xl font-extrabold tracking-tight text-[#233a30]">A little closer, wherever you are.</h2>
         <p className="mx-auto max-w-sm text-sm leading-6 text-[#7c8e84]">
-          Pick someone from your contacts and start a conversation. Your messages arrive in real time.
+          Pick someone from your contacts and start a conversation. New people and messages show up automatically.
         </p>
       </div>
     </div>

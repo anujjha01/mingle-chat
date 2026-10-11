@@ -10,27 +10,29 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  getUsers: async () => {
-    set({ isUsersLoading: true });
+  getUsers: async ({ silent = false } = {}) => {
+    if (!silent) set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/users");
-      set({ users: res.data });
+      const selectedUser = get().selectedUser;
+      const refreshedSelectedUser = selectedUser && res.data.find((user) => user._id === selectedUser._id);
+      set({ users: res.data, ...(refreshedSelectedUser ? { selectedUser: refreshedSelectedUser } : {}) });
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (!silent) toast.error(error.response?.data?.message || "Could not load people");
     } finally {
-      set({ isUsersLoading: false });
+      if (!silent) set({ isUsersLoading: false });
     }
   },
 
-  getMessages: async (userId) => {
-    set({ isMessagesLoading: true });
+  getMessages: async (userId, { silent = false } = {}) => {
+    if (!silent) set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (!silent) toast.error(error.response?.data?.message || "Could not load messages");
     } finally {
-      set({ isMessagesLoading: false });
+      if (!silent) set({ isMessagesLoading: false });
     }
   },
   sendMessage: async (messageData) => {

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Search, Users } from "lucide-react";
+import { Copy, Search, Users } from "lucide-react";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
@@ -13,12 +14,15 @@ const Sidebar = () => {
 
   useEffect(() => {
     getUsers();
+    const refresh = setInterval(() => getUsers({ silent: true }), 5000);
+    return () => clearInterval(refresh);
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
+    ? users.filter((user) => user.isOnline)
     : users;
   const visibleUsers = filteredUsers.filter((user) => user.fullName.toLowerCase().includes(query.toLowerCase()));
+  const onlineCount = users.filter((user) => user.isOnline).length;
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -40,7 +44,7 @@ const Sidebar = () => {
             />
             <span className="text-sm">Show online only</span>
           </label>
-          <span className="text-xs text-[#82928a]">({onlineUsers.length} online now)</span>
+          <span className="text-xs text-[#82928a]">({onlineCount} online now)</span>
         </div>
       </div>
 
@@ -60,7 +64,7 @@ const Sidebar = () => {
                 alt={user.name}
                 className="size-11 rounded-full object-cover ring-2 ring-white"
               />
-              {onlineUsers.includes(user._id) && (
+              {user.isOnline && (
                 <span
                   className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-white bg-[#39a978]"
                 />
@@ -71,14 +75,35 @@ const Sidebar = () => {
             <div className="hidden lg:block text-left min-w-0">
               <div className="truncate text-sm font-bold text-[#2d4037]">{user.fullName}</div>
               <div className="mt-0.5 text-xs text-[#84948b]">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                {user.isOnline ? "Online" : "Offline"}
               </div>
             </div>
           </button>
         ))}
 
-        {visibleUsers.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
+        {visibleUsers.length === 0 && users.length === 0 && (
+          <div className="mx-4 my-5 rounded-2xl border border-[#e5ece7] bg-white p-4 text-center lg:mx-5">
+            <p className="text-sm font-semibold text-[#344b40]">You’re ready to chat</p>
+            <p className="mt-2 text-xs leading-5 text-[#7c8e84]">Share Mingle with someone. Once they create an account, they’ll appear here automatically.</p>
+            <button
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#246b55] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1e5b48]"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(window.location.origin);
+                  toast.success("Mingle link copied");
+                } catch {
+                  toast.error("Could not copy the link");
+                }
+              }}
+            >
+              <Copy className="size-3.5" /> Copy invite link
+            </button>
+          </div>
+        )}
+        {visibleUsers.length === 0 && users.length > 0 && (
+          <div className="px-4 py-5 text-center text-sm text-[#7c8e84]">
+            {showOnlineOnly ? "No one is online right now" : "No people match that search"}
+          </div>
         )}
       </div>
     </aside>

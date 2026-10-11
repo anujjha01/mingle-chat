@@ -66,3 +66,13 @@ export const updateProfile = async (req, res) => {
 };
 
 export const checkAuth = (req, res) => res.status(200).json(req.user);
+
+export const heartbeat = async (req, res) => {
+  try {
+    await pool.query("UPDATE users SET last_seen_at = NOW() WHERE id = $1", [req.user._id]);
+    res.status(204).end();
+  } catch (error) {
+    console.error("Error updating presence", error.message);
+    res.status(500).json({ message: "Could not update online status" });
+  }
+};

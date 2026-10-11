@@ -13,6 +13,7 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket: null,
+  presenceTimer: null,
 
   checkAuth: async () => {
     try {
@@ -84,7 +85,14 @@ export const useAuthStore = create((set, get) => ({
 
   connectSocket: () => {
     const { authUser } = get();
-    if (!authUser || get().socket?.connected) return;
+    if (!authUser) return;
+
+    if (!get().presenceTimer) {
+      const sendHeartbeat = () => axiosInstance.post("/auth/heartbeat").catch(() => {});
+      sendHeartbeat();
+      set({ presenceTimer: setInterval(sendHeartbeat, 30000) });
+    }
+    if (get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
       path: import.meta.env.MODE === "development" ? "/socket.io" : "/api/socket.io",
@@ -102,5 +110,7 @@ export const useAuthStore = create((set, get) => ({
   },
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
+    if (get().presenceTimer) clearInterval(get().presenceTimer);
+    set({ presenceTimer: null, onlineUsers: [] });
   },
 }));
