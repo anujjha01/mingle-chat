@@ -1,12 +1,14 @@
 import { pool, toMessage, toUser } from "../lib/db.js";
-import { uploadImage } from "../lib/imagekit.js";
+import { getImageKitPrivateKey, uploadImage } from "../lib/imagekit.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT id, full_name, email, profile_pic, created_at,
-              COALESCE(last_seen_at > NOW() - INTERVAL '90 seconds', FALSE) AS is_online
+              COALESCE(last_seen_at > NOW() - INTERVAL '90 seconds', FALSE) AS is_online,
+              (SELECT COUNT(*)::INT FROM messages m
+               WHERE m.sender_id = users.id AND m.receiver_id = $1 AND m.read_at IS NULL) AS unread_count
        FROM users WHERE id <> $1 ORDER BY full_name`,
       [req.user._id]
     );
@@ -19,6 +21,10 @@ export const getUsersForSidebar = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   try {
+    await pool.query(
+      "UPDATE messages SET read_at = NOW() WHERE sender_id = $1 AND receiver_id = $2 AND read_at IS NULL",
+      [req.params.id, req.user._id]
+    );
     const { rows } = await pool.query(
       `SELECT id, sender_id, receiver_id, text, image, created_at
        FROM messages
@@ -29,7 +35,7 @@ export const getMessages = async (req, res) => {
     res.status(200).json(rows.map(toMessage));
   } catch (error) {
     console.error("Error in getMessages", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status || 500).json({ message: error.status ? error.message : "Internal server error" });
   }
 };
 
@@ -39,7 +45,7 @@ export const sendMessage = async (req, res) => {
     const receiverId = req.params.id;
     let imageUrl = null;
     if (image) {
-      if (!process.env.IMAGEKIT_PRIVATE_KEY) return res.status(503).json({ message: "Image uploads are not configured" });
+      if (!getImageKitPrivateKey()) return res.status(503).json({ message: "Image uploads need an ImageKit key. Add IMAGEKIT_PRIVATE_KEY in Vercel settings." });
       imageUrl = await uploadImage(image);
     }
     if (!text?.trim() && !imageUrl) return res.status(400).json({ message: "A message or image is required" });
@@ -56,6 +62,6 @@ export const sendMessage = async (req, res) => {
     res.status(201).json(message);
   } catch (error) {
     console.error("Error in sendMessage", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status || 500).json({ message: error.status ? error.message : "Could not send message" });
   }
 };

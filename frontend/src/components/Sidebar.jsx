@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Copy, Search, Users } from "lucide-react";
 import toast from "react-hot-toast";
@@ -8,7 +7,6 @@ import toast from "react-hot-toast";
 const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
 
-  const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -31,7 +29,10 @@ const Sidebar = () => {
       <div className="w-full border-b border-[#e9eeea] px-4 pb-4 pt-6 lg:px-5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[#243c32]"><Users className="size-5" /><span className="hidden font-bold lg:block">Your people</span></div>
-          <span className="hidden rounded-full bg-[#e9f4ed] px-2 py-1 text-[11px] font-bold text-[#34785e] lg:block">{users.length} contacts</span>
+          <span className="hidden items-center gap-1.5 rounded-full bg-[#e9f4ed] px-2 py-1 text-[11px] font-bold text-[#34785e] lg:flex">
+            {users.length} contacts
+            {users.some((user) => user.unreadCount > 0) && <span className="rounded-full bg-rose-500 px-1.5 text-white">{users.reduce((total, user) => total + user.unreadCount, 0)}</span>}
+          </span>
         </div>
         <div className="relative mt-4 hidden lg:block"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#90a098]" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Find a conversation" className="w-full rounded-xl border border-[#e7ede8] bg-white py-2.5 pl-9 pr-3 text-sm outline-none transition placeholder:text-[#9ba9a1] focus:border-[#a9cbb8] focus:ring-2 focus:ring-[#e1f0e7]" /></div>
         <div className="mt-3 hidden items-center gap-2 lg:flex">
@@ -77,6 +78,7 @@ const Sidebar = () => {
               <div className="mt-0.5 text-xs text-[#84948b]">
                 {user.isOnline ? "Online" : "Offline"}
               </div>
+              {user.unreadCount > 0 && <span className="mt-1 inline-flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{user.unreadCount}</span>}
             </div>
           </button>
         ))}

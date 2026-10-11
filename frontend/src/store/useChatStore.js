@@ -16,6 +16,18 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/users");
       const selectedUser = get().selectedUser;
       const refreshedSelectedUser = selectedUser && res.data.find((user) => user._id === selectedUser._id);
+      const previousUsers = get().users;
+      for (const user of res.data) {
+        const previous = previousUsers.find((candidate) => candidate._id === user._id);
+        if (silent && previous && user._id !== selectedUser?._id && user.unreadCount > previous.unreadCount) {
+          const title = `New message from ${user.fullName}`;
+          if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+            new Notification(title, { body: "Open Mingle to read and reply." });
+          } else {
+            toast(title);
+          }
+        }
+      }
       set({ users: res.data, ...(refreshedSelectedUser ? { selectedUser: refreshedSelectedUser } : {}) });
     } catch (error) {
       if (!silent) toast.error(error.response?.data?.message || "Could not load people");
@@ -40,8 +52,10 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
       set({ messages: [...messages, res.data] });
+      return true;
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Could not send the message");
+      return false;
     }
   },
 

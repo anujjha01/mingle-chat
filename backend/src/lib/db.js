@@ -27,8 +27,10 @@ export const connectDB = async () => {
       receiver_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       text TEXT,
       image TEXT,
+      read_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMPTZ;
     CREATE INDEX IF NOT EXISTS messages_conversation_created_idx
       ON messages (sender_id, receiver_id, created_at);
   `);
@@ -41,6 +43,7 @@ export const toUser = (row) => row && ({
   email: row.email,
   profilePic: row.profile_pic,
   isOnline: row.is_online ?? false,
+  unreadCount: Number(row.unread_count || 0),
   createdAt: row.created_at,
 });
 

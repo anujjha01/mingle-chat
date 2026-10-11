@@ -2,25 +2,27 @@ import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { prepareImage } from "../lib/prepareImage";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [isPreparingImage, setIsPreparingImage] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef(null);
   const { sendMessage } = useChatStore();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (!file?.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    if (!file) return;
+    setIsPreparingImage(true);
+    prepareImage(file)
+      .then(setImagePreview)
+      .catch((error) => toast.error(error.message || "Could not prepare that image"))
+      .finally(() => {
+        setIsPreparingImage(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      });
   };
 
   const removeImage = () => {
@@ -32,11 +34,13 @@ const MessageInput = () => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
 
+    setIsSending(true);
     try {
-      await sendMessage({
+      const sent = await sendMessage({
         text: text.trim(),
         image: imagePreview,
       });
+      if (!sent) return;
 
       // Clear form
       setText("");
@@ -44,6 +48,8 @@ const MessageInput = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -79,7 +85,7 @@ const MessageInput = () => {
           />
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp,image/gif"
             className="hidden"
             ref={fileInputRef}
             onChange={handleImageChange}
@@ -87,7 +93,7 @@ const MessageInput = () => {
 
           <button
             type="button"
-            className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition sm:flex
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition
                      ${imagePreview ? "border-[#cbe3d1] bg-[#edf6ef] text-[#246b55]" : "border-[#e3eae5] bg-white text-[#8a9b91] hover:bg-[#f5f8f5]"}`}
             onClick={() => fileInputRef.current?.click()}
           >
@@ -97,7 +103,7 @@ const MessageInput = () => {
         <button
           type="submit"
           className="brand-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={!text.trim() && !imagePreview}
+          disabled={isPreparingImage || isSending || (!text.trim() && !imagePreview)}
         >
           <Send size={22} />
         </button>

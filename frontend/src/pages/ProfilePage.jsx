@@ -1,24 +1,30 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
+import toast from "react-hot-toast";
+import { prepareImage } from "../lib/prepareImage";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
+  const [isPreparingImage, setIsPreparingImage] = useState(false);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      setSelectedImg(base64Image);
-      await updateProfile({ profilePic: base64Image });
-    };
+    setIsPreparingImage(true);
+    try {
+      const image = await prepareImage(file);
+      setSelectedImg(image);
+      await updateProfile({ profilePic: image });
+    } catch (error) {
+      toast.error(error.message || "Could not prepare that image");
+    } finally {
+      setIsPreparingImage(false);
+      setSelectedImg(null);
+      e.target.value = "";
+    }
   };
 
   return (
@@ -54,14 +60,14 @@ const ProfilePage = () => {
                   type="file"
                   id="avatar-upload"
                   className="hidden"
-                  accept="image/*"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
                   onChange={handleImageUpload}
-                  disabled={isUpdatingProfile}
+                  disabled={isUpdatingProfile || isPreparingImage}
                 />
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
+              {isPreparingImage ? "Preparing image..." : isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
             </p>
           </div>
 

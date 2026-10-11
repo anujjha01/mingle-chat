@@ -1,7 +1,7 @@
 import { generateToken } from "../lib/utils.js";
 import { pool, toUser } from "../lib/db.js";
 import bcrypt from "bcryptjs";
-import { uploadImage } from "../lib/imagekit.js";
+import { getImageKitPrivateKey, uploadImage } from "../lib/imagekit.js";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -52,7 +52,7 @@ export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
     if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
-    if (!process.env.IMAGEKIT_PRIVATE_KEY) return res.status(503).json({ message: "Profile image uploads are not configured" });
+    if (!getImageKitPrivateKey()) return res.status(503).json({ message: "Profile image uploads need an ImageKit key. Add IMAGEKIT_PRIVATE_KEY in Vercel settings." });
     const profilePicUrl = await uploadImage(profilePic);
     const { rows } = await pool.query(
       "UPDATE users SET profile_pic = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
@@ -61,7 +61,7 @@ export const updateProfile = async (req, res) => {
     res.status(200).json(toUser(rows[0]));
   } catch (error) {
     console.error("Error in update profile", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(error.status || 500).json({ message: error.status ? error.message : "Could not update profile photo" });
   }
 };
 
