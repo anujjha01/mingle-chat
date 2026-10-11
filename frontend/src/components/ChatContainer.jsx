@@ -36,7 +36,7 @@ const ChatContainer = () => {
           const mine = message.senderId === authUser._id;
           return (
             <div key={message._id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
-              {!mine && <div className="avatar mb-1 shrink-0"><div className="size-7 rounded-full"><img src={selectedUser.profilePic || "/avatar.png"} alt="" /></div></div>}
+              {!mine && <div className="avatar mb-1 shrink-0"><div className="size-7 rounded-full"><img src={selectedUser.profilePic || "/avatar.png"} alt={`${selectedUser.fullName}'s profile`} /></div></div>}
               <div className="max-w-[82%] sm:max-w-[68%]">
                 <div className={`mb-1 text-[10px] font-semibold text-[#9aa79f] ${mine ? "text-right" : ""}`}>{mine ? "You" : selectedUser.fullName.split(" ")[0]} · {formatMessageTime(message.createdAt)}</div>
                 <div className={`message-bubble px-4 py-2.5 shadow-sm ${mine ? "mine" : "theirs"}`}>
@@ -44,6 +44,7 @@ const ChatContainer = () => {
                   {message.text && <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</p>}
                 </div>
               </div>
+              {mine && <div className="avatar mb-1 shrink-0"><div className="size-7 rounded-full"><img src={authUser.profilePic || "/avatar.png"} alt="Your profile" /></div></div>}
             </div>
           );
         })}
