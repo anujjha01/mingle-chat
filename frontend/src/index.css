@@ -16,6 +16,9 @@ button, input { font: inherit; }
 .message-bubble.mine { background: #246b55; color: #fff; border-bottom-right-radius: 5px; }
 .message-bubble.theirs { background: #edf2ee; color: #24332d; border-bottom-left-radius: 5px; }
 .brand-mark { background: linear-gradient(145deg,#2f8066,#205844); box-shadow: 0 7px 18px #276b5530; }
+.empty-chat-panel { background: radial-gradient(ellipse at center, #f5faf5 0, transparent 70%); }
+.empty-chat-title { color: #233a30; }
+.empty-chat-copy { color: #7c8e84; }
 
 .app-theme { background-color: oklch(var(--b1)); color: oklch(var(--bc)); }
 [data-theme="dark"] .app-shell { background: radial-gradient(ellipse at top left, #293b38 0, transparent 48%), #1d232a; }
@@ -31,3 +34,16 @@ button, input { font: inherit; }
 [data-theme="dark"] .soft-scrollbar::-webkit-scrollbar-thumb { background: #58646e; }
 [data-theme="dark"] .message-bubble.mine { background: #246b55; color: #fff; }
 [data-theme="dark"] .message-bubble.theirs { background: #29343b; color: #e3ebe8; }
+[data-theme="dark"] .empty-chat-panel { background: radial-gradient(ellipse at center, rgba(49,75,67,.2) 0, transparent 68%); }
+[data-theme="dark"] .empty-chat-title { color: #e4ece8; }
+[data-theme="dark"] .empty-chat-copy { color: #aab8b2; }
+[data-theme="dark"] .chat-sidebar { background: #242c33; border-color: #39434b; }
+[data-theme="dark"] .chat-sidebar-header { border-color: #39434b; }
+[data-theme="dark"] .chat-contact-button:hover { background: #303a41; }
+[data-theme="dark"] .chat-contact-button[class*="bg-[#edf5ef]"] { background: #30413d; box-shadow: inset 0 0 0 1px #43564f; }
+[data-theme="dark"] .chat-contact-button img { --tw-ring-color: #39434b; }
+[data-theme="dark"] .chat-contact-button [class*="border-white"] { border-color: #242c33; }
+[data-theme="dark"] .chat-contact-name { color: #e1e9e5; }
+[data-theme="dark"] .chat-contact-status { color: #9eaea7; }
+[data-theme="dark"] .chat-header { background: #242b33; border-color: #39434b; }
+[data-theme="dark"] .chat-message-list { background: linear-gradient(180deg, #1e252c, #202830); }

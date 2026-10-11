@@ -5,7 +5,7 @@ const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
 
   return (
-    <div className="flex items-center justify-between border-b border-[#e9eeea] bg-white px-4 py-3.5 sm:px-6">
+    <div className="chat-header flex items-center justify-between border-b border-[#e9eeea] bg-white px-4 py-3.5 sm:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}

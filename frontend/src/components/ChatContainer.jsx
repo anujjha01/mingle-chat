@@ -30,7 +30,7 @@ const ChatContainer = () => {
   return (
     <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <ChatHeader />
-      <div className="soft-scrollbar flex-1 space-y-5 overflow-y-auto bg-[linear-gradient(180deg,#fbfdfb,#f8faf8)] px-4 py-5 sm:px-7">
+      <div className="chat-message-list soft-scrollbar flex-1 space-y-5 overflow-y-auto bg-[linear-gradient(180deg,#fbfdfb,#f8faf8)] px-4 py-5 sm:px-7">
         {messages.length === 0 && <div className="flex h-full min-h-40 items-center justify-center text-center text-sm text-[#84948b]">This is the beginning of your conversation.<br />Say hello to {selectedUser.fullName.split(" ")[0]} 👋</div>}
         {messages.map((message) => {
           const mine = message.senderId === authUser._id;

@@ -25,8 +25,8 @@ const Sidebar = () => {
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
-    <aside className="flex h-full w-[76px] shrink-0 flex-col border-r border-[#e9eeea] bg-[#fbfcfb] transition-all duration-200 lg:w-[310px]">
-      <div className="w-full border-b border-[#e9eeea] px-4 pb-4 pt-6 lg:px-5">
+    <aside className="chat-sidebar flex h-full w-[76px] shrink-0 flex-col border-r border-[#e9eeea] bg-[#fbfcfb] transition-all duration-200 lg:w-[310px]">
+      <div className="chat-sidebar-header w-full border-b border-[#e9eeea] px-4 pb-4 pt-6 lg:px-5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[#243c32]"><Users className="size-5" /><span className="hidden font-bold lg:block">Your people</span></div>
           <span className="hidden items-center gap-1.5 rounded-full bg-[#e9f4ed] px-2 py-1 text-[11px] font-bold text-[#34785e] lg:flex">
@@ -54,7 +54,7 @@ const Sidebar = () => {
           <button
             key={user._id}
             onClick={() => setSelectedUser(user)}
-            className={`
+            className={`chat-contact-button
               mx-2 flex w-[calc(100%-16px)] items-center gap-3 rounded-2xl p-2.5 transition-colors hover:bg-[#f0f5f1] lg:mx-3 lg:w-[calc(100%-24px)] lg:px-3
               ${selectedUser?._id === user._id ? "bg-[#edf5ef] ring-1 ring-[#dbe9de]" : ""}
             `}
@@ -74,8 +74,8 @@ const Sidebar = () => {
 
             {/* User info - only visible on larger screens */}
             <div className="hidden lg:block text-left min-w-0">
-              <div className="truncate text-sm font-bold text-[#2d4037]">{user.fullName}</div>
-              <div className="mt-0.5 text-xs text-[#84948b]">
+              <div className="chat-contact-name truncate text-sm font-bold text-[#2d4037]">{user.fullName}</div>
+              <div className="chat-contact-status mt-0.5 text-xs text-[#84948b]">
                 {user.isOnline ? "Online" : "Offline"}
               </div>
               {user.unreadCount > 0 && <span className="mt-1 inline-flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{user.unreadCount}</span>}
