@@ -55,3 +55,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.ar
 }
 
 export { app, server };
+export default server;

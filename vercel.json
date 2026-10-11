@@ -1,6 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
-  "outputDirectory": "frontend/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "services": {
+    "mingle-api": {
+      "root": "backend",
+      "framework": "express",
+      "entrypoint": "src/index.js"
+    },
+    "mingle-web": {
+      "root": "frontend",
+      "framework": "vite"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": { "service": "mingle-api" } },
+    { "source": "/(.*)", "destination": { "service": "mingle-web" } }
+  ]
 }
