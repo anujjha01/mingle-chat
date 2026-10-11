@@ -5,8 +5,11 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, process.env.NODE_ENV === "production" ? {} : {
+const io = new Server(server, {
+  path: process.env.VERCEL ? "/api/socket.io" : "/socket.io",
+  ...(process.env.NODE_ENV !== "production" ? {
   cors: { origin: process.env.CLIENT_ORIGIN || "http://localhost:5173", credentials: true },
+  } : {}),
 });
 
 export function getReceiverSocketId(userId) {

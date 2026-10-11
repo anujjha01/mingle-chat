@@ -87,6 +87,7 @@ export const useAuthStore = create((set, get) => ({
     if (!authUser || get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
+      path: import.meta.env.MODE === "development" ? "/socket.io" : "/api/socket.io",
       query: {
         userId: authUser._id,
       },
