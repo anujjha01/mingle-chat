@@ -58,6 +58,20 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  loginDemo: async () => {
+    set({ isLoggingIn: true });
+    try {
+      const res = await axiosInstance.post("/auth/demo");
+      set({ authUser: res.data });
+      toast.success("Welcome to the Mingle demo");
+      get().connectSocket();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Could not start the demo. Please try again.");
+    } finally {
+      set({ isLoggingIn: false });
+    }
+  },
+
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");

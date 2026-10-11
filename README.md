@@ -7,6 +7,7 @@ A simple, real-time chat app for one-to-one conversations.
 ## Features
 
 - Create an account and sign in securely
+- Explore with a one-click demo account and sample conversation (demo activity is shared)
 - Send text and image messages in real time
 - See online status and unread-message notifications
 - Update your profile photo

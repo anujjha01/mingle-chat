@@ -11,7 +11,7 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
-  const { login, isLoggingIn } = useAuthStore();
+  const { login, loginDemo, isLoggingIn } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,6 +92,22 @@ const LoginPage = () => {
               )}
             </button>
           </form>
+
+          <div className="space-y-3">
+            <div className="divider my-0 text-xs text-base-content/45">or explore first</div>
+            <button
+              type="button"
+              className="btn btn-outline w-full"
+              onClick={loginDemo}
+              disabled={isLoggingIn}
+            >
+              {isLoggingIn ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+              Continue with demo account
+            </button>
+            <p className="text-center text-xs leading-relaxed text-base-content/55">
+              No sign-up needed. Demo messages are shared with other demo visitors.
+            </p>
+          </div>
 
           <div className="text-center">
             <p className="text-base-content/60">

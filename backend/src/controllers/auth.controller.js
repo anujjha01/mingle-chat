@@ -1,12 +1,70 @@
 import { generateToken } from "../lib/utils.js";
 import { pool, toUser } from "../lib/db.js";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { getImageKitPrivateKey, uploadImage } from "../lib/imagekit.js";
+
+const DEMO_EMAIL = "demo@mingle.chat";
+const DEMO_FRIEND_EMAIL = "guide@mingle.chat";
+
+const ensureDemoAccounts = async () => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", ["mingle-demo-accounts"]);
+
+    const createAccount = async (fullName, email) => {
+      const existing = await client.query(
+        "SELECT id, full_name, email, profile_pic, created_at FROM users WHERE email = $1",
+        [email]
+      );
+      if (existing.rows[0]) return existing.rows[0];
+
+      const passwordHash = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
+      const inserted = await client.query(
+        "INSERT INTO users (full_name, email, password) VALUES ($1, $2, $3) ON CONFLICT (email) DO NOTHING RETURNING id, full_name, email, profile_pic, created_at",
+        [fullName, email, passwordHash]
+      );
+      if (inserted.rows[0]) return inserted.rows[0];
+      const conflict = await client.query(
+        "SELECT id, full_name, email, profile_pic, created_at FROM users WHERE email = $1",
+        [email]
+      );
+      return conflict.rows[0];
+    };
+
+    const demo = await createAccount("Mingle Demo", DEMO_EMAIL);
+    const guide = await createAccount("Mingle Guide", DEMO_FRIEND_EMAIL);
+    if (!demo || !guide) throw new Error("Could not create demo accounts");
+
+    const conversation = await client.query(
+      "SELECT 1 FROM messages WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1) LIMIT 1",
+      [demo.id, guide.id]
+    );
+    if (!conversation.rowCount) {
+      await client.query(
+        "INSERT INTO messages (sender_id, receiver_id, text, read_at) VALUES ($1, $2, $3, NOW()), ($2, $1, $4, NULL)",
+        [demo.id, guide.id, "Hi! Welcome to Mingle. This sample conversation shows how real-time chat works.", "Thanks! You can send a message or try an image upload here."]
+      );
+    }
+
+    await client.query("COMMIT");
+    return demo;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   if (!fullName?.trim() || !email?.trim() || !password) {
     return res.status(400).json({ message: "Name, email, and password are required" });
+  }
+  if ([DEMO_EMAIL, DEMO_FRIEND_EMAIL].includes(email.trim().toLowerCase())) {
+    return res.status(409).json({ message: "That email is reserved for the Mingle demo" });
   }
   if (password.length < 6) return res.status(400).json({ message: "Password must be at least 6 characters" });
 
@@ -23,6 +81,18 @@ export const signup = async (req, res) => {
     if (error.code === "23505") return res.status(409).json({ message: "Email already exists" });
     console.error("Error in signup controller", error.message);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const demoLogin = async (_req, res) => {
+  try {
+    const row = await ensureDemoAccounts();
+    const user = toUser(row);
+    generateToken(user._id, res);
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error starting demo session:", error.message);
+    res.status(503).json({ message: "The demo account is temporarily unavailable. Please try again." });
   }
 };
 
@@ -50,6 +120,9 @@ export const logout = (_req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    if (req.user.email === DEMO_EMAIL) {
+      return res.status(403).json({ message: "Profile changes are disabled for the shared demo account" });
+    }
     const { profilePic } = req.body;
     if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
     if (!getImageKitPrivateKey()) return res.status(503).json({ message: "Profile image uploads need an ImageKit key. Add IMAGEKIT_PRIVATE_KEY in Vercel settings." });

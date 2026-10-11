@@ -9,7 +9,11 @@ export const getUsersForSidebar = async (req, res) => {
               COALESCE(last_seen_at > NOW() - INTERVAL '90 seconds', FALSE) AS is_online,
               (SELECT COUNT(*)::INT FROM messages m
                WHERE m.sender_id = users.id AND m.receiver_id = $1 AND m.read_at IS NULL) AS unread_count
-       FROM users WHERE id <> $1 ORDER BY full_name`,
+       FROM users
+       WHERE id <> $1
+         AND (email NOT IN ('demo@mingle.chat', 'guide@mingle.chat')
+              OR (email = 'guide@mingle.chat' AND $1 = (SELECT id FROM users WHERE email = 'demo@mingle.chat')))
+       ORDER BY full_name`,
       [req.user._id]
     );
     res.status(200).json(rows.map(toUser));
