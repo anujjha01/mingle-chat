@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mingle
+      POSTGRES_USER: mingle
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mingle-local-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mingle -d mingle"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5001
+      DATABASE_URL: postgres://mingle:${POSTGRES_PASSWORD:-mingle-local-password}@db:5432/mingle
+      JWT_SECRET: ${JWT_SECRET:-replace-this-local-secret-before-deploying}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5001}
+      DATABASE_SSL: "false"
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+    ports:
+      - "5001:5001"
+
+volumes:
+  postgres_data:
