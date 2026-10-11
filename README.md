@@ -2,6 +2,8 @@
 
 Mingle is a real-time messaging app with a responsive interface, JWT-based accounts, online presence, and persistent one-to-one conversations. It is built with React, Express, Socket.IO, and PostgreSQL.
 
+**Live demo:** [mingle-chat-one.vercel.app](https://mingle-chat-one.vercel.app)
+
 ## Features
 
 - Sign up, sign in, and protected account sessions
@@ -52,7 +54,14 @@ Set `IMAGEKIT_PRIVATE_KEY` in the backend environment to enable profile and mess
 
 ## Production deployment
 
-Build and run the included Docker image with a managed PostgreSQL database. Set `NODE_ENV=production`, `DATABASE_URL`, `DATABASE_SSL=true` when required by the database provider, and `JWT_SECRET`. Keep credentials in the hosting provider's secret settings, not in Git. A Render Blueprint is included in `render.yaml`.
+The Vercel project deploys the Vite frontend and Express/Socket.IO backend together using Vercel Services. The `vercel.json` file routes `/api/*` to the backend and other paths to the frontend. Connect a hosted PostgreSQL database and set these project environment variables in Vercel before using account and messaging features:
+
+- `DATABASE_URL`: hosted PostgreSQL connection string
+- `DATABASE_SSL=true`: enable TLS for hosted PostgreSQL
+- `JWT_SECRET`: a long, random signing secret
+- `IMAGEKIT_PRIVATE_KEY`: optional; set a rotated ImageKit private key to enable image uploads
+
+The backend creates its database tables automatically on first request. Keep credentials in the hosting provider's secret settings, not in Git. For container hosting, a Render Blueprint is also included in `render.yaml`.
 
 ## Stack
 
