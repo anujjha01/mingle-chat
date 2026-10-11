@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { Link } from "react-router-dom";
-import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+import MingleLogo from "../components/MingleLogo";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,9 +26,7 @@ const LoginPage = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="brand-mark flex h-12 w-12 items-center justify-center rounded-2xl transition-transform group-hover:-rotate-3">
-                <MessageSquare className="h-6 w-6 text-white" />
-              </div>
+              <MingleLogo iconSize="size-10" />
               <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
               <p className="text-base-content/60">Sign in to your account</p>
             </div>

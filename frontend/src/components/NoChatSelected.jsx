@@ -1,4 +1,4 @@
-import { MessageSquare } from "lucide-react";
+import MingleLogo from "./MingleLogo";
 
 const NoChatSelected = () => {
   return (
@@ -7,11 +7,7 @@ const NoChatSelected = () => {
         {/* Icon Display */}
         <div className="flex justify-center gap-4 mb-4">
           <div className="relative">
-            <div
-              className="brand-mark flex h-16 w-16 items-center justify-center rounded-2xl"
-            >
-              <MessageSquare className="h-7 w-7 text-white" />
-            </div>
+            <MingleLogo iconSize="size-14" wordmark={false} />
           </div>
         </div>
 

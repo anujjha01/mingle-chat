@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Bell, LogOut, MessageSquare, Moon, Settings, Sun, User } from "lucide-react";
+import { Bell, LogOut, Moon, Settings, Sun, User } from "lucide-react";
+import MingleLogo from "./MingleLogo";
 import { useThemeStore } from "../store/useThemeStore";
 import { useChatStore } from "../store/useChatStore";
 import { useEffect } from "react";
@@ -35,11 +36,8 @@ const Navbar = () => {
       <div className="container mx-auto h-16 px-3 sm:px-4">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2.5 hover:opacity-80 transition-all">
-              <div className="brand-mark flex size-9 items-center justify-center rounded-xl">
-                <MessageSquare className="h-5 w-5 text-white" />
-              </div>
-              <div><h1 className="text-base font-extrabold tracking-tight">Mingle</h1><span className="-mt-0.5 hidden text-[10px] font-medium tracking-[.16em] text-[#769087] sm:block">MESSAGES, IN REAL TIME</span></div>
+            <Link to="/" className="transition-opacity hover:opacity-80">
+              <MingleLogo />
             </Link>
           </div>
 

@@ -16,6 +16,8 @@ button, input { font: inherit; }
 .message-bubble.mine { background: #246b55; color: #fff; border-bottom-right-radius: 5px; }
 .message-bubble.theirs { background: #edf2ee; color: #24332d; border-bottom-left-radius: 5px; }
 .brand-mark { background: linear-gradient(145deg,#2f8066,#205844); box-shadow: 0 7px 18px #276b5530; }
+.mingle-logo-mark { display: inline-flex; flex: none; align-items: center; justify-content: center; border-radius: 11px; background: #176b55; color: #fff; font-family: 'Manrope', sans-serif; font-size: 23px; font-weight: 800; line-height: 1; letter-spacing: -.08em; padding-right: 2px; }
+.mingle-wordmark { color: #25352f; font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 750; letter-spacing: -.055em; }
 .empty-chat-panel { background: radial-gradient(ellipse at center, #f5faf5 0, transparent 70%); }
 .empty-chat-title { color: #233a30; }
 .empty-chat-copy { color: #7c8e84; }
@@ -47,3 +49,4 @@ button, input { font: inherit; }
 [data-theme="dark"] .chat-contact-status { color: #9eaea7; }
 [data-theme="dark"] .chat-header { background: #242b33; border-color: #39434b; }
 [data-theme="dark"] .chat-message-list { background: linear-gradient(180deg, #1e252c, #202830); }
+[data-theme="dark"] .mingle-wordmark { color: #edf2ef; }
