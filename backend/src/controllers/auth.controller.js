@@ -1,7 +1,7 @@
 import { generateToken } from "../lib/utils.js";
 import { pool, toUser } from "../lib/db.js";
 import bcrypt from "bcryptjs";
-import cloudinary from "../lib/cloudinary.js";
+import { uploadImage } from "../lib/imagekit.js";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -52,11 +52,11 @@ export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
     if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
-    if (!process.env.CLOUDINARY_CLOUD_NAME) return res.status(503).json({ message: "Profile image uploads are not configured" });
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    if (!process.env.IMAGEKIT_PRIVATE_KEY) return res.status(503).json({ message: "Profile image uploads are not configured" });
+    const profilePicUrl = await uploadImage(profilePic);
     const { rows } = await pool.query(
       "UPDATE users SET profile_pic = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
-      [uploadResponse.secure_url, req.user._id]
+      [profilePicUrl, req.user._id]
     );
     res.status(200).json(toUser(rows[0]));
   } catch (error) {

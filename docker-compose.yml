@@ -27,9 +27,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-replace-this-local-secret-before-deploying}
       CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5001}
       DATABASE_SSL: "false"
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      IMAGEKIT_PRIVATE_KEY: ${IMAGEKIT_PRIVATE_KEY:-}
     ports:
       - "5001:5001"
 
